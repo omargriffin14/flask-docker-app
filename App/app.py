@@ -1,33 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_mysqldb import MySQL
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# MySQL configuration
-app.config['MYSQL_HOST'] = 'db'
-app.config['MYSQL_USER'] = 'flaskuser'
-app.config['MYSQL_PASSWORD'] = 'flaskpassword'
-app.config['MYSQL_DB'] = 'flaskdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:flaskpassword@db:3306/flaskdb'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-mysql = MySQL(app)
+db = SQLAlchemy(app)
+
+class Task(db.Model):
+    __tablename__ = 'tasks'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    task = db.Column(db.String(255), nullable=False)
+
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():
-    cur = mysql.connection.cursor()
-    cur.execute('CREATE TABLE IF NOT EXISTS tasks (id INT AUTO_INCREMENT PRIMARY KEY, task VARCHAR(255))')
-    cur.execute('SELECT * FROM tasks')
-    tasks = cur.fetchall()
-    cur.close()
+    tasks = Task.query.all()
     return render_template('index.html', tasks=tasks)
 
 @app.route('/add', methods=['POST'])
 def add():
     task = request.form.get('task')
     if task:
-        cur = mysql.connection.cursor()
-        cur.execute('INSERT INTO tasks (task) VALUES (%s)', (task,))
-        mysql.connection.commit()
-        cur.close()
+        new_task = Task(task=task)
+        db.session.add(new_task)
+        db.session.commit()
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
