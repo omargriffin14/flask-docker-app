@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
+                git branch: 'main', url: https://github.com/omargriffin14/flask-docker-app.git'
             }
         }
 
