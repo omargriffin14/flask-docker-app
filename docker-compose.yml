@@ -8,8 +8,6 @@ services:
       MYSQL_DATABASE: flaskdb
       MYSQL_USER: flaskuser
       MYSQL_PASSWORD: flaskpassword
-    ports:
-      - "3306:3306"
 
   web:
     build: ./app
