@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   db:
     image: mysql:8.0
@@ -8,6 +7,8 @@ services:
       MYSQL_DATABASE: flaskdb
       MYSQL_USER: flaskuser
       MYSQL_PASSWORD: flaskpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   web:
     build: ./app
@@ -17,3 +18,7 @@ services:
       - db
     environment:
       - FLASK_ENV=development
+      - DATABASE_URL=mysql+pymysql://flaskuser:flaskpassword@db:3306/flaskdb
+
+volumes:
+  mysql_data:
